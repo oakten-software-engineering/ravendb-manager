@@ -254,34 +254,66 @@ class RavenDBManager
 		end
 	end
 
-	def http_get(url)
+	def http_get(url, is_retry=false)
 		http = Net::HTTP.new(@hostname, @port)
 		request = Net::HTTP::Get.new(URI.escape(url))
 		request['Authorization'] = "Bearer #{@bearer_token}"
-		return http.request(request)
+
+		response = http.request(request)
+		if (has_token_expired?(response) && !is_retry) then
+			@bearer_token = get_bearer_token
+			return http_get(url, true)
+		end
+
+		return response
 	end
 
-	def http_delete(url)
+	def http_delete(url, is_retry=false)
 		http = Net::HTTP.new(@hostname, @port)
 		request = Net::HTTP::Delete.new(URI.escape(url))
 		request['Authorization'] = "Bearer #{@bearer_token}"
-		return http.request(request)
+		
+		response = http.request(request)
+		if (has_token_expired?(request) && !is_retry) then
+			@bearer_token = get_bearer_token
+			return http_delete(url, true)
+		end
+
+		return response
 	end
 
-	def http_put(url, document)
+	def http_put(url, document, is_retry=false)
 		http = Net::HTTP.new(@hostname, @port)
 		request = Net::HTTP::Put.new(URI.escape(url))
 		request['Authorization'] = "Bearer #{@bearer_token}"
 		request.body = document
-		return http.request(request)
+
+		response = http.request(request)
+		if (has_token_expired?(request) && !is_retry) then
+			@bearer_token = get_bearer_token
+			return http_put(url, document, true)
+		end
+
+		return response
 	end
 
-	def http_post(url, document = nil)
+	def http_post(url, document = nil, is_retry=false)
 		http = Net::HTTP.new(@hostname, @port)
 		request = Net::HTTP::Post.new(URI.escape(url))
 		request['Authorization'] = "Bearer #{@bearer_token}"
 		request.body = document unless document.nil?
-		return http.request(request)
+		
+		response = http.request(request)
+		if (has_token_expired?(request) && !is_retry) then
+			@bearer_token = get_bearer_token
+			return http_post(url, document, true)
+		end
+
+		return response
+	end
+
+	def has_token_expired?(request)
+		return request.code == "401" && request['www-authenticate'].include?('The access token is expired')
 	end
 	
 	def get_bearer_token
