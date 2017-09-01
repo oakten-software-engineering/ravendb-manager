@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'ravendb-manager'
-  s.version     = '0.1.2'
+  s.version     = '0.1.3'
   s.date        = '2017-08-31'
   s.summary     = "Manage your RavenDB Document Database"
   s.description = "Allows to manage and monitor your RavenDB Document Database"
@@ -10,4 +10,5 @@ Gem::Specification.new do |s|
   s.homepage    =
     'https://github.com/oakten-software-engineering/ravendb-manager'
   s.license       = 'GPL-3.0'
+  s.required_ruby_version = '>= 1.9.2'
 end

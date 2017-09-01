@@ -200,15 +200,18 @@ class RavenDBManager
 
 	# Backup ...
 
-	def create_api_key(name)
+	def create_api_key(name, secret = generate_secret)
 		raise "Invalid ApiKey name #{name}" unless is_valid_string?(name)
+		raise "Invalid secret #{secret}" unless is_valid_string?(secret)
 
 		document = {
 			'Enabled' => true,
 			'Name' => name,
-			'Secret' => generate_secret,
+			'Secret' => secret,
 			'Databases': []
 		}
+		p document
+		exit
 		key = "Raven/ApiKeys/#{name}"
 		put_document('<system>', key, document)
 		return "#{name}/#{document['Secret']}"

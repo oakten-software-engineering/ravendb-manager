@@ -108,8 +108,13 @@ manager.server_statistics
 ### Create new API Key
 Create a new API key. If an API key with the same name already exists it will be replaced. Returns the newly generated API key.
 ```ruby
+# Automaticly genrate secret
 manager.create_api_key('apikey')
 => "apikey/raBreMBH9xv1aanDPZGx23Kv6ow7mrd"
+
+# Use explicit secret
+manager.create_api_key('apikey', 'kYep0o8QLTqdVSZygJ7xMFO')
+=> "apikey/kYep0o8QLTqdVSZygJ7xMFO"
 ```
 
 ### List API Keys
@@ -127,8 +132,8 @@ Adds permissions for a database to an API key.
 manager.add_db_to_api_key('apikey', 'DB1')
 
 # Add admin permission
-manager.add_db_to_api_key('apikey', 'DB1', true, false)
+manager.add_db_to_api_key('apikey', 'DB2', true, false)
 
 # Add read only permission
-manager.add_db_to_api_key('apikey', 'DB1', false, true)
+manager.add_db_to_api_key('apikey', 'DB3', false, true)
 ```
