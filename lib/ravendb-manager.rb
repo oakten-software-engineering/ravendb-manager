@@ -24,17 +24,18 @@ class RavenDBManager
 	def initialize(hostname, port, api_key_name, api_key_secret)
 		raise 'hostname is empty' unless !hostname.to_s.empty?
 		raise 'port is invalid' unless port.to_i != 0
+
 		raise 'api_key_name empty' unless !api_key_name.to_s.empty?
 		raise 'api_key_secret empty' unless !api_key_secret.to_s.empty?
 
 		@hostname = hostname.to_s
 		@port = port.to_i
-		@api_key_name = api_key_name.to_s
-		@api_key_secret = api_key_secret.to_s
-		
+
 		@uri = "http://#{@hostname}:#{port}"
 		@oauth_endpoint = URI.parse("#{@uri}/OAuth/API-Key")
 		
+		@api_key_name = api_key_name.to_s
+		@api_key_secret = api_key_secret.to_s
 		@bearer_token = get_bearer_token
 	end
 
@@ -228,6 +229,12 @@ class RavenDBManager
 		return nil
 	end
 
+	def list_api_keys
+		response = http_get('/databases/<system>/streams/docs?startsWith=Raven/ApiKeys&pageSize=1024')
+		raise get_error_string(response) unless is_success?(response)
+		return JSON.parse(response.body)['Results'].map {|k| [ k['Name'], { :databases => k['Databases'], :secret => k['Secret']}]}.to_h
+	end
+
 	private
 
 	PASSWORD_CHARS = [*('a'..'z'),*('A'..'Z'),*(0..9)]
@@ -260,7 +267,7 @@ class RavenDBManager
 		request['Authorization'] = "Bearer #{@bearer_token}"
 
 		response = http.request(request)
-		if (has_token_expired?(response) && !is_retry) then
+		if has_token_expired?(response) && !is_retry then
 			@bearer_token = get_bearer_token
 			return http_get(url, true)
 		end
@@ -274,7 +281,7 @@ class RavenDBManager
 		request['Authorization'] = "Bearer #{@bearer_token}"
 		
 		response = http.request(request)
-		if (has_token_expired?(request) && !is_retry) then
+		if has_token_expired?(request) && !is_retry then
 			@bearer_token = get_bearer_token
 			return http_delete(url, true)
 		end
@@ -289,7 +296,7 @@ class RavenDBManager
 		request.body = document
 
 		response = http.request(request)
-		if (has_token_expired?(request) && !is_retry) then
+		if has_token_expired?(request) && !is_retry then
 			@bearer_token = get_bearer_token
 			return http_put(url, document, true)
 		end
@@ -304,7 +311,7 @@ class RavenDBManager
 		request.body = document unless document.nil?
 		
 		response = http.request(request)
-		if (has_token_expired?(request) && !is_retry) then
+		if has_token_expired?(request) && !is_retry then
 			@bearer_token = get_bearer_token
 			return http_post(url, document, true)
 		end

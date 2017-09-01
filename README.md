@@ -112,6 +112,13 @@ manager.create_api_key('apikey')
 => "apikey/raBreMBH9xv1aanDPZGx23Kv6ow7mrd"
 ```
 
+### List API Keys
+Returns a `Hash` with all API keys.
+```ruby
+manager.list_api_keys
+=> {"apikey"=>{:databases=>[{"Admin"=>true, "TenantId"=>"*", "ReadOnly"=>false}, {"Admin"=>true, "TenantId"=>"<system>", "ReadOnly"=>false}], :secret=>"raBreMBH9xv1aanDPZGx23Kv6ow7mrd"}}
+```
+
 ### Add Database Permission to API Key
 Adds permissions for a database to an API key.
 
