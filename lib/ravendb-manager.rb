@@ -210,8 +210,6 @@ class RavenDBManager
 			'Secret' => secret,
 			'Databases': []
 		}
-		p document
-		exit
 		key = "Raven/ApiKeys/#{name}"
 		put_document('<system>', key, document)
 		return "#{name}/#{document['Secret']}"
