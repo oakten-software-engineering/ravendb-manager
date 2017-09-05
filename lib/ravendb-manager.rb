@@ -323,7 +323,7 @@ class RavenDBManager
 	end
 
 	def has_token_expired?(request)
-		return request.code == "401" && request['www-authenticate'].include?('The access token is expired')
+		return request['www-authenticate'].to_s.include?('The access token is expired')
 	end
 	
 	def get_bearer_token
